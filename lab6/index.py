@@ -39,7 +39,7 @@ def main(args, rank=None, world_size=None):
         d = {question: []}
         batch_size = 32
         epochs = 2
-        print(f'{batch_size=}')
+        print(f'{batch_size=} {rank=} {world_size=}')
         while True:
             try:
                 a = init(args, rank=rank, world_size=world_size, batch_size_arg=batch_size)
