@@ -75,6 +75,7 @@ def main(args, rank=None, world_size=None):
         print(f"{a['device']=}")
         loss, acc, running_times = train(a['train_loader'], a['device'], a['optimizer'], a['model'], a['criterion'], epochs)
         output = {'Top Accuracy': acc, 'Losses': loss, 'Running_times': running_times, 'batch_size': batch_size}
+        d[question].append(output)
         output_file_with_rank = f"output_rank_{rank}.json"
         write_to_file(d, output_file_with_rank)
         print(d)
