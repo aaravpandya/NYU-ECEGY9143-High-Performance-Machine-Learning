@@ -63,7 +63,21 @@ def main(args, rank=None, world_size=None):
         output_file_with_rank = f"output_rank_{rank}.json"
         write_to_file(d, output_file_with_rank)
         print(d)
-
+    elif question == 'q4':
+        d = {question: []}
+        batch_size = 8192
+        epochs = 5
+        print(f'{batch_size=} {rank=} {world_size=}')
+        a = init(args, rank=rank, world_size=world_size, batch_size_arg=batch_size)
+        if(a['device'] == None):
+            a['device'] = f'cuda:{rank}'
+            a['model'].to(a['device'])
+        print(f"{a['device']=}")
+        loss, acc, running_times = train(a['train_loader'], a['device'], a['optimizer'], a['model'], a['criterion'], epochs)
+        output = {'Top Accuracy': acc, 'Losses': loss, 'Warmup_times': warmup_times, 'Running_times': running_times, 'batch_size': batch_size}
+        output_file_with_rank = f"output_rank_{rank}.json"
+        write_to_file(d, output_file_with_rank)
+        print(d)
 
 def run(rank, world_size, args):
     os.environ['MASTER_ADDR'] = 'localhost'
@@ -87,7 +101,7 @@ if __name__ == '__main__':
     world_size = torch.cuda.device_count()
     if(args.question=='q2'):
         world_size = 2
-    if world_size > 1 and (args.question == 'q2' or args.question == 'q3'):
+    if world_size > 1 and (args.question == 'q2' or args.question == 'q3' or args.question == 'q4'):
         mp.spawn(run, args=(world_size, args), nprocs=world_size, join=True)
     else:
         main(args)
