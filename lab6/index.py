@@ -15,13 +15,6 @@ def main():
     question = args.question
     output_file = args.output_file
     if question == 'q1':
-        a = init(args)
-        loss, acc, running_times = train(a['train_loader'],a['device'],a['optimizer'],a['model'],a['criterion'],a['epochs'])
-        output = {'Top Accuracy': acc, 'Losses': loss, 'Running_times': running_times}
-        d = {question: [output]}
-        write_to_file(d,output_file)
-        print(d)
-    elif question == 'c3':
         d = {question: []}
         batch_size = 32
         epochs = 2
@@ -36,9 +29,24 @@ def main():
             except RuntimeError as e:
                 if "CUDA out of memory" in str(e):
                     break
-                else:0
+                else:
                     raise e
         write_to_file(d, output_file)
+        print(d)
+    elif question == 'c3':
+        num_workers = 0
+        last_running_time = 10000
+        d = {question: []}
+        while(True):
+            a = init(args)
+            loss, acc, running_times = train(a['train_loader'],a['device'],a['optimizer'],a['model'],a['criterion'],a['epochs'])
+            output = {'Top Accuracy': acc, 'Losses': loss, 'Running_times': running_times, 'num_workers': num_workers}
+            d[question].append(output)
+            if(running_times[0]["Data loading time"] > last_running_time):
+                break
+            last_running_time = running_times[0]["Data loading time"]
+            num_workers += 4
+        write_to_file(d,output_file)
         print(d)
     elif question == 'c4':
         d = {question: []}
