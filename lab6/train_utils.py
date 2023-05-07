@@ -12,6 +12,7 @@ def train_one_epoch(train_dataloader: DataLoader, device, optimizer, model: Modu
     total = 0
     data_loading_time = 0
     training_time = 0
+    communication_time = 0
     loops = 0
     start_time = perf_counter()
     data_loading_start_time = perf_counter()
@@ -20,22 +21,19 @@ def train_one_epoch(train_dataloader: DataLoader, device, optimizer, model: Modu
         loops+=1
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data[0].to(device), data[1].to(device)
-        
-        
-        
         training_start_time = perf_counter()
-        
         # zero the parameter gradients
         optimizer.zero_grad()
-
         # forward + backward + optimize
         outputs = model(inputs)
         _, predicted = torch.max(outputs.data, 1)
         correct += (predicted == labels).float().sum().item()
         loss = criterion(outputs, labels)
+        communication_start_time = perf_counter()
         loss.backward()
         optimizer.step()
-        
+        communication_time += perf_counter() - communication_start_time
+
         training_time += perf_counter() - training_start_time
 
         # print statistics
@@ -48,7 +46,12 @@ def train_one_epoch(train_dataloader: DataLoader, device, optimizer, model: Modu
     epoch_loss = running_loss / len(train_dataloader.dataset)
     epoch_acc = correct / total
     epoch_info = [epoch_loss, epoch_acc]
-    running_times = {"Data loading time": data_loading_time, "Training time": training_time, "Total epoch time": total_running_time_for_epoch}
+    running_times = {
+        "Data loading time": data_loading_time,
+        "Training time": training_time,
+        "Communication time": communication_time,
+        "Total epoch time": total_running_time_for_epoch
+    }
     
     return epoch_info, running_times
 def train(train_dataloader: DataLoader, device, optimizer, model: Module, criterion, epochs: int) -> tuple:
