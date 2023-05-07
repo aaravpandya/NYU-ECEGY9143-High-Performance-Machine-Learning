@@ -42,7 +42,6 @@ def train_one_epoch(train_dataloader: DataLoader, device, optimizer, model: Modu
         running_loss += loss.item() * inputs.size(0)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
-        correct += (predicted == labels).sum().item()
         data_loading_start_time = perf_counter()
         
     total_running_time_for_epoch = perf_counter() - start_time

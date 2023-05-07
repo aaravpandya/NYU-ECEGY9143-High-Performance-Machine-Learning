@@ -47,12 +47,14 @@ def main(args, rank=None, world_size=None):
                     a['device'] = f'cuda:{rank}'
                     a['model'].to(a['device'])
                 print(f"{a['device']=}")
-                _, _, warmup_times = train(a['train_loader'], a['device'], a['optimizer'], a['model'], a['criterion'], 1)
-                loss, acc, running_times = train(a['train_loader'], a['device'], a['optimizer'], a['model'], a['criterion'], epochs - 1)
+                _, _, warmup_times = train(a['train_loader'], a['device'], a['optimizer'], a['model'], a['criterion'], 2)
+                loss, acc, running_times = train(a['train_loader'], a['device'], a['optimizer'], a['model'], a['criterion'], 1)
                 output = {'Top Accuracy': acc, 'Losses': loss, 'Warmup_times': warmup_times, 'Running_times': running_times, 'batch_size': batch_size}
                 print(output)
                 d[question].append(output)
                 batch_size *= 4
+                if(batch_size > 512):
+                    break
             except RuntimeError as e:
                 if "CUDA out of memory" in str(e):
                     break
