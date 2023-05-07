@@ -14,7 +14,7 @@ def main():
     args = parser.parse_args()
     question = args.question
     output_file = args.output_file
-    print(f'Running question {question}'
+    print(f'Running question {question}')
     if question == 'q1':
         d = {question: []}
         batch_size = 32
