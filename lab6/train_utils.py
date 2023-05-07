@@ -80,16 +80,21 @@ def GetOptimizer(model: Module,opt: str = 'sgd'):
     if(opt=='adagrad'):
         return Adagrad(model.parameters(),lr=lr,weight_decay=weight_decay)
 
-def GetModel(device):
+def GetModel():
     model = resnet18()
-    model.to(device)
     model.train()
     return model
 
 
-def GetDevice(preffered_device):
-    device = torch.device('cuda:0' if torch.cuda.is_available(
-    ) else 'cpu') if preffered_device == 'gpu' else 'cpu'
+def GetDevice(preffered_device, rank=None):
+    if preffered_device == 'gpu' and torch.cuda.is_available():
+        if rank is not None:
+            return torch.device(f'cuda:{rank}')
+        else:
+            return torch.device('cuda:0')
+    else:
+        return torch.device('cpu')
+
 
 
 

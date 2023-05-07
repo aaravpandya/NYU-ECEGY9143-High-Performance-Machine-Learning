@@ -3,6 +3,7 @@ import json
 import torch
 from train_utils import GetOptimizer, GetModel, GetDevice
 from data_utils import GetTrainTestLoaders
+from torch.nn.parallel import DistributedDataParallel as DDP
 
 def write_to_file(data, filename):
     if not os.path.isfile(filename):
@@ -30,7 +31,7 @@ def find_best_num_workers(filename):
             num_workers = item['num_workers']
     return num_workers
 
-def init(args, workers=None, device_arg=None, optimizer_arg = None, batch_size_arg = 32):
+def init(args, rank=None, world_size=None, workers=None, device_arg=None, optimizer_arg=None, batch_size_arg=32):
     preffered_device = device_arg if device_arg is not None else args.device
     num_workers = workers if workers is not None else args.num_workers
     optimizer = optimizer_arg if optimizer_arg is not None else args.optimizer
@@ -38,9 +39,12 @@ def init(args, workers=None, device_arg=None, optimizer_arg = None, batch_size_a
     question = args.question
     output_file = args.output_file
 
-    train_loader, _ = GetTrainTestLoaders(num_workers, batch_size=batch_size_arg)
-    device = GetDevice(preffered_device)
-    model = GetModel(device)
+    train_loader, _ = GetTrainTestLoaders(num_workers, batch_size=batch_size_arg, rank=rank, world_size=world_size)
+    device = GetDevice(preffered_device, rank=rank)
+    model = GetModel().to(device)  # Remove the `device` parameter
+    if rank is not None and world_size is not None:
+        model = DDP(model, device_ids=[rank], output_device=rank)
+
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = GetOptimizer(model, opt=optimizer)
     d = {
