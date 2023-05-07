@@ -3,7 +3,7 @@ from torchvision.transforms import RandomCrop, RandomHorizontalFlip, ToTensor, N
 from torch.utils.data import DataLoader
 from time import perf_counter
 
-def GetTrainTestLoaders(num_workers = 1, load_test = False):
+def GetTrainTestLoaders(num_workers = 1, load_test = False, batch_size=32):
     transformImages = Compose([
     RandomCrop(size=32, padding=[4]),
     RandomHorizontalFlip(p=0.5),
@@ -22,9 +22,9 @@ def GetTrainTestLoaders(num_workers = 1, load_test = False):
         download=False,
         transform=transformImages
     )
-    train_dataloader = DataLoader(train, batch_size=128, shuffle=True, num_workers=num_workers)
+    train_dataloader = DataLoader(train, batch_size=batch_size, shuffle=True, num_workers=num_workers)
     if(load_test):
-        test_dataloader = DataLoader(test, batch_size=100, shuffle=True, num_workers=num_workers)
+        test_dataloader = DataLoader(test, batch_size=batch_size, shuffle=True, num_workers=num_workers)
         return train_dataloader, test_dataloader
     else:
         return train_dataloader, None

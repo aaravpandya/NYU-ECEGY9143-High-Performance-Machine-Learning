@@ -20,7 +20,7 @@ def main():
         epochs = 2
         while True:
             try:
-                a = init(args, batch_size=batch_size)
+                a = init(args, batch_size_arg=batch_size)
                 _, _, warmup_times = train(a['train_loader'], a['device'], a['optimizer'], a['model'], a['criterion'], 1)
                 loss, acc, running_times = train(a['train_loader'], a['device'], a['optimizer'], a['model'], a['criterion'], epochs - 1)
                 output = {'Top Accuracy': acc, 'Losses': loss, 'Warmup_times': warmup_times, 'Running_times': running_times, 'batch_size': batch_size}
