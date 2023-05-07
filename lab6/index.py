@@ -35,7 +35,7 @@ def main(args, rank=None, world_size=None):
                     raise e
         write_to_file(d, output_file)
         print(d)
-    elif question == 'q2':
+    elif question == 'q2' or question == 'q3':
         d = {question: []}
         batch_size = 32
         epochs = 2
@@ -83,7 +83,9 @@ if __name__ == '__main__':
     parser.add_argument('--question', type=str, default='c2')
     args = parser.parse_args()
     world_size = torch.cuda.device_count()
-    if world_size > 1 and args.question == 'q2':
+    if(args.question=='q2'):
+        world_size = 2
+    if world_size > 1 and (args.question == 'q2' or args.question == 'q3'):
         mp.spawn(run, args=(world_size, args), nprocs=world_size, join=True)
     else:
         main(args)
