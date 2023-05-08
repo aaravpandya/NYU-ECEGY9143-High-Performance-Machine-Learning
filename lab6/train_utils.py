@@ -51,7 +51,7 @@ def train_one_epoch(train_dataloader: DataLoader, device, optimizer, model: Modu
     M = (M*4)/(1024*1024*1024)
     T_latency = 0.015
     T_bandwidth = 100
-    allreduce = (P - 1) * T_latency + (P * M * T_bandwidth)
+    allreduce = (P - 1) * T_latency + (P * M / T_bandwidth)
     bwutil = (P*M) / allreduce
     running_times = {
         "Data loading time": data_loading_time,
