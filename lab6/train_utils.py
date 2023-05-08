@@ -29,8 +29,8 @@ def train_one_epoch(train_dataloader: DataLoader, device, optimizer, model: Modu
         _, predicted = torch.max(outputs.data, 1)
         correct += (predicted == labels).float().sum().item()
         loss = criterion(outputs, labels)
-        communication_start_time = perf_counter()
         loss.backward()
+        communication_start_time = perf_counter()
         optimizer.step()
         communication_time += perf_counter() - communication_start_time
 
@@ -53,13 +53,15 @@ def train_one_epoch(train_dataloader: DataLoader, device, optimizer, model: Modu
     T_bandwidth = 100
     allreduce = (P - 1) * T_latency + (P * M / T_bandwidth)
     bwutil = (P*M) / allreduce
+    effectivebwutil = (P*M) / (communication_time)
     running_times = {
         "Data loading time": data_loading_time,
         "Training time": training_time,
         "Communication time": communication_time,
         "Total epoch time": total_running_time_for_epoch,
         "Bandwidth utilization": bwutil,
-        "allreduce_time": allreduce
+        "allreduce_time": allreduce,
+        "Effective bandwidth utilization": effectivebwutil
     }
     
     return epoch_info, running_times
