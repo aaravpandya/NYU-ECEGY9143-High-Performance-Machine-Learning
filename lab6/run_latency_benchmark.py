@@ -5,7 +5,7 @@ from LatencyMeasure import measure_latency_bandwidth
 import os
 def init_process(rank, world_size, backend='nccl'):
     os.environ['MASTER_ADDR'] = 'localhost'
-    os.environ['MASTER_PORT'] = '12355'
+    os.environ['MASTER_PORT'] = '12356'
     dist.init_process_group(backend, rank=rank, world_size=world_size)
 
 def worker(rank, world_size):
