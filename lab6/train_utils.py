@@ -46,11 +46,19 @@ def train_one_epoch(train_dataloader: DataLoader, device, optimizer, model: Modu
     epoch_loss = running_loss / len(train_dataloader.dataset)
     epoch_acc = correct / total
     epoch_info = [epoch_loss, epoch_acc]
+    P = torch.cuda.device_count()
+    M = sum(param.grad.numel() for param in model.parameters() if param.grad is not None)
+    T_latency = 0.015
+    T_bandwidth = 100
+    allreduce = (P - 1) * T_latency + (P * M * T_bandwidth)
+    bwutil = (P*M) / allreduce
     running_times = {
         "Data loading time": data_loading_time,
         "Training time": training_time,
         "Communication time": communication_time,
-        "Total epoch time": total_running_time_for_epoch
+        "Total epoch time": total_running_time_for_epoch,
+        "Bandwidth utilization": bwutil,
+        "allreduce_time": allreduce
     }
     
     return epoch_info, running_times
