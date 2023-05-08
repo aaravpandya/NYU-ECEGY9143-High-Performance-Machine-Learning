@@ -2,13 +2,13 @@ import time
 import torch
 import torch.distributed as dist
 
-def measure_latency_bandwidth():
+def measure_latency_bandwidth(rank):
     # Number of iterations for averaging the measurements
     iterations = 100
 
     # Prepare small and large tensors for latency and bandwidth measurement
-    small_tensor = torch.tensor([0.0], device='cuda:0')
-    large_tensor = torch.rand(1000000, device='cuda:0')  # 1 million elements
+    small_tensor = torch.tensor([0.0], device=f'cuda:{rank}')
+    large_tensor = torch.rand(1000000, device=f'cuda:{rank}')  # 1 million elements
 
     # Ensure synchronization before starting the timer
     torch.cuda.synchronize()
