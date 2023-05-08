@@ -48,6 +48,7 @@ def train_one_epoch(train_dataloader: DataLoader, device, optimizer, model: Modu
     epoch_info = [epoch_loss, epoch_acc]
     P = torch.cuda.device_count()
     M = sum(param.grad.numel() for param in model.parameters() if param.grad is not None)
+    M = (M*4)/(1024*1024*1024)
     T_latency = 0.015
     T_bandwidth = 100
     allreduce = (P - 1) * T_latency + (P * M * T_bandwidth)
